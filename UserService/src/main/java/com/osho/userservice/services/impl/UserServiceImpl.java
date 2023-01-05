@@ -4,6 +4,7 @@ import com.osho.userservice.entites.Hotel;
 import com.osho.userservice.entites.Rating;
 import com.osho.userservice.entites.User;
 import com.osho.userservice.exception.ResourceNotFoundException;
+import com.osho.userservice.external.service.HotelService;
 import com.osho.userservice.repositories.UserRepository;
 import com.osho.userservice.services.UserService;
 import org.slf4j.Logger;
@@ -36,6 +37,8 @@ public class UserServiceImpl implements UserService {
 
     @Value("${service.hotel}")
     private String HOTEL_SERVICE;
+    @Autowired
+    private HotelService hotelService;
 
     @Override
     public User saveUser(User user) {
@@ -64,9 +67,7 @@ public class UserServiceImpl implements UserService {
         Rating[] ratings = restTemplate.getForObject(RATING_SERVICE + user.getUserId(), Rating[].class);
         List<Rating> ratingsOfUser = Arrays.stream(ratings).toList();
         List<Rating> ratingList = ratingsOfUser.stream().map(rating -> {
-            ResponseEntity<Hotel> response = restTemplate.getForEntity(HOTEL_SERVICE + rating.getHotelId(), Hotel.class);
-            Hotel hotel = response.getBody();
-            logger.info("Response Status {} ", response.getStatusCode());
+            Hotel hotel = hotelService.getHotel(rating.getHotelId());
             rating.setHotel(hotel);
             return rating;
         }).collect(Collectors.toList());
