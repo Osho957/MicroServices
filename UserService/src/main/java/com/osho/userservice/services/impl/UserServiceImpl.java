@@ -9,6 +9,7 @@ import com.osho.userservice.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +30,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Value("${service.rating}")
+    private String RATING_SERVICE;
+
+    @Value("${service.hotel}")
+    private String HOTEL_SERVICE;
 
     @Override
     public User saveUser(User user) {
@@ -54,11 +61,10 @@ public class UserServiceImpl implements UserService {
     }
 
     public void getUserRating(User user) {
-        Rating[] ratings = restTemplate.getForObject("http://localhost:8083/ratings/get/user?userId=" + user.getUserId(), Rating[].class);
-        logger.info("{} ", ratings);
+        Rating[] ratings = restTemplate.getForObject(RATING_SERVICE + user.getUserId(), Rating[].class);
         List<Rating> ratingsOfUser = Arrays.stream(ratings).toList();
         List<Rating> ratingList = ratingsOfUser.stream().map(rating -> {
-            ResponseEntity<Hotel> response = restTemplate.getForEntity("http://localhost:8082/hotels/get?id=" + rating.getHotelId(), Hotel.class);
+            ResponseEntity<Hotel> response = restTemplate.getForEntity(HOTEL_SERVICE + rating.getHotelId(), Hotel.class);
             Hotel hotel = response.getBody();
             logger.info("Response Status {} ", response.getStatusCode());
             rating.setHotel(hotel);
