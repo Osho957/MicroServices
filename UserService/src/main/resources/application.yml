@@ -24,3 +24,7 @@ eureka:
     register-with-eureka: true
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+service:
+  rating: "http://RATING-SERVICE/ratings/get/user?userId="
+  hotel: "http://HOTEL-SERVICE/hotels/get?id="
