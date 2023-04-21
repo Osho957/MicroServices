@@ -1,0 +1,11 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: CONfIG-SERVER
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Osho957/ConfigService
+          clone-on-start: true
